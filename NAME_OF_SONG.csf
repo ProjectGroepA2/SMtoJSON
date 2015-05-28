@@ -2,7 +2,8 @@
 /* Generated on 28-05-2015 15:17:00 */
 {
 	"meta": {
-		"name": "name of song",
+		"title": "title of song",
+		"subtitle": "subtitle of song",
 		"author": "author of song",
 		"creator": "creator of song",
 		"BPM": 0
