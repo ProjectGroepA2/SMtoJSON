@@ -1,5 +1,3 @@
-/* Generated with Avans SMtoCSF by Janco Kock and Kenneth van Ewijk */
-/* Generated on 28-05-2015 15:17:00 */
 {
 	"meta": {
 		"title": "title of song",
@@ -10,25 +8,39 @@
 	},
 	"file": {
 		"audio": "song audio file",
-		"image": "song image file",
-		"file": "name of this file"
+		"background": "song background image",
+		"banner": "song banner image"
 	},
-	"data": {
-		"easy": [
-			{ 
-				"time": 1,
-				"direction": 1,
-				"color": "BLUE",
-				"hold": true,
-				"length": 1000 
-			},
-			{
-				"time": 16,
-				"direction": 6,
-				"color": "YELLOW"
-			}
-		],
-		"medium": [],
-		"hard": []
-	}
+	"data": [
+		{
+			"difficulty": "easy",
+			"objects": [
+				{ 
+					"time": 1,
+					"direction": 1,
+					"color": "BLUE",
+					"hold": true,
+					"length": 1000 
+				},
+				{
+					"time": 16,
+					"direction": 6,
+					"color": "YELLOW"
+				}
+			]
+		},
+		{
+			"difficulty": "medium",
+			"objects": [
+				{
+					"time": 4,
+					"direction": 3,
+					"color": "PURPLE"
+				},
+				{
+
+				}
+			]
+		}
+	]
 }
