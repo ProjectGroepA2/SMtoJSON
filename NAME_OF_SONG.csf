@@ -1,0 +1,33 @@
+/* Generated with Avans SMtoCSF by Janco Kock and Kenneth van Ewijk */
+/* Generated on 28-05-2015 15:17:00 */
+{
+	"meta": {
+		"name": "name of song",
+		"author": "author of song",
+		"creator": "creator of song",
+		"BPM": 0
+	},
+	"file": {
+		"audio": "song audio file",
+		"image": "song image file",
+		"file": "name of this file"
+	},
+	"data": {
+		"easy": [
+			{ 
+				"time": 1,
+				"direction": 1,
+				"color": "BLUE",
+				"hold": true,
+				"length": 1000 
+			},
+			{
+				"time": 16,
+				"direction": 6,
+				"color": "YELLOW"
+			}
+		],
+		"medium": [],
+		"hard": []
+	}
+}
