@@ -1,4 +1,5 @@
 package SMParser;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -7,6 +8,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
@@ -16,13 +18,17 @@ import javax.json.JsonWriter;
 
 
 public class SMParser {
-	private static String[] metaDataHeaders = {"OFFSET:","TITLE:","ARTIST:", "DISPLAYBPM:", "MUSIC","SAMPLESTART:", "BANNER:", "BACKGROUND:", "SUBTITLE:"};
+	private static String[] metaDataHeaders = {"offset:","title:","artist:", "displaybpm:", "music","samplestart:", "banner:", "background:", "subtitle:"};
 	private String[] metadata;
 	private ArrayList<JsonObjectBuilder> arrays;
 	
 	public SMParser(){
+		
+	}
+	
+	public void parseSmFile(File inputfile){
 		try {
-			String file = readFile("test", Charset.defaultCharset());
+			String file = readFile(inputfile.getAbsolutePath(), Charset.defaultCharset());
 			String[] mainsplit = file.split("\\#");
 			arrays = new ArrayList<JsonObjectBuilder>();
 			metadata = new String[metaDataHeaders.length];
@@ -30,7 +36,7 @@ public class SMParser {
 				//searching for the metadata
 				int i = 0;
 				for(String header:metaDataHeaders){
-					if(s.contains(header)){
+					if(s.toLowerCase().contains(header) && metadata[i] == null){
 						metadata[i] = getValue(s).replace(';', ' ').trim();
 					}
 					i++;
@@ -51,7 +57,9 @@ public class SMParser {
 						int extraButtonTime = notesplit.length / difficultyToMaxButtons(difficulty);
 						int maxButtons = 1;						
 						JsonArrayBuilder objectsArrayBuilder = Json.createArrayBuilder();
-						
+						JsonArrayBuilder buttonsArrayBuilder = Json.createArrayBuilder();
+						buttonsArrayBuilder.add(Json.createObjectBuilder().add("time", 0).add("button", 0).add("color", 0));
+												
 						for(String notespersecond:notesplit){
 							notespersecond = notespersecond.trim();
 							String[] notes = notespersecond.split("\n");
@@ -63,10 +71,11 @@ public class SMParser {
 									JsonObjectBuilder object = Json.createObjectBuilder();
 									object.add("time", time);
 									object.add("direction", direction);
-									object.add("button", (int)(Math.random()*maxButtons));
+									object.add("button", (int)(Math.random()*maxButtons+1));
 									objectsArrayBuilder.add(object.build());
 								}
-								if(extraButtonTime*maxButtons < time){
+								if(extraButtonTime*maxButtons < time && maxButtons+1 < difficultyToMaxButtons(difficulty)){ //add a new/extra button
+									buttonsArrayBuilder.add(Json.createObjectBuilder().add("time", time).add("button", maxButtons).add("color", maxButtons));
 									maxButtons++;
 								}
 								time += precision;
@@ -76,32 +85,70 @@ public class SMParser {
 						
 						arrays.add(Json.createObjectBuilder());
 						arrays.get(arrays.size()-1).add("difficulty", difficulty);
-						arrays.get(arrays.size()-1).add("objects", objectsArrayBuilder);					
+						arrays.get(arrays.size()-1).add("objects", objectsArrayBuilder);
+						arrays.get(arrays.size()-1).add("buttons", buttonsArrayBuilder);					
 					}
 				};
 			}
-			writeJsonFile();
+			for(int i = 0; i < metadata.length; i++){
+				if(metadata[i] == null){
+					metadata[i] = "0";
+				}
+			}
+			writeJsonFile(inputfile);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	private void writeJsonFile(){
+	private void writeJsonFile(File inputfile){
 		JsonObjectBuilder jsonfilebuilder = Json.createObjectBuilder();
 		JsonArrayBuilder dataArrayBuilder = Json.createArrayBuilder();
 		
-		jsonfilebuilder.add("meta", Json.createObjectBuilder().add("title", metadata[1]).add("subtitle", metadata[8]).add("author", metadata[2]).add("BPM", Double.parseDouble(metadata[3])).add("sample_start", Double.parseDouble(metadata[5])));
+		double bpm = 0;
+		double samples = 0;
+		try{
+			Double.parseDouble(metadata[3]);
+		}catch(java.lang.NumberFormatException e){
+			
+		}
+		try{
+			Double.parseDouble(metadata[5]);
+		}catch(java.lang.NumberFormatException e){
+			
+		}
+		
+		jsonfilebuilder.add("meta", Json.createObjectBuilder().add("title", metadata[1]).add("subtitle", metadata[8]).add("author", metadata[2]).add("BPM", bpm).add("sample_start", samples));
 		jsonfilebuilder.add("file", Json.createObjectBuilder().add("audio", metadata[4]).add("background", metadata[7]).add("banner", metadata[6]));
+
 		for(JsonObjectBuilder ar:arrays){
 			dataArrayBuilder.add(ar.build());
 		}
 		jsonfilebuilder.add("data", dataArrayBuilder);
 		
-		
 		try {
+			String name = metadata[1].trim().replaceAll("[^a-zA-Z0-9.-]", "_")+metadata[8].trim().replaceAll("[^a-zA-Z0-9.-]", "_");;
+			String dirname = "scannedsongs/"+name+(int)(Math.random()*10);
+			File  f = new File(dirname);
+			f.mkdir();
+			try {
+				Files.copy(new File(inputfile.getParent() + "/" + metadata[4]).toPath(), new File(dirname +"/"+metadata[4]).toPath());
+			} catch (IOException e) {
+				System.out.println("Music file not found");
+				f.delete();
+				return;
+			}
+			try {
+				Files.copy(new File(inputfile.getParent() + "/" + metadata[6]).toPath(), new File(dirname +"/"+metadata[6]).toPath());
+			} catch (IOException e) {
+			}
+			try {
+				Files.copy(new File(inputfile.getParent() + "/" + metadata[7]).toPath(), new File(dirname +"/"+metadata[7]).toPath());
+			} catch (IOException e) {
+			}
 			JsonObject file = jsonfilebuilder.build();
 			OutputStream os;
-			os = new FileOutputStream("emp.txt");
+			os = new FileOutputStream(dirname+"/"+name+".csf");
 			JsonWriter jsonWriter = Json.createWriter(os);
 			jsonWriter.writeObject(file);
 			jsonWriter.close();		
@@ -111,22 +158,25 @@ public class SMParser {
 
 	}
 	
+	
+	
+	
 	private int difficultyToMaxButtons(String d){
-		if(d.equals("Beginner")){
+		if(d.toLowerCase().equals("beginner")){
 			return 2;
-		}else if(d.equals("Easy")){
+		}else if(d.equals("easy")){
 			return 3;
-		}else if(d.equals("Medium")){
+		}else if(d.equals("medium")){
 			return 4;
-		}else if(d.equals("Hard")){
+		}else if(d.equals("hard")){
 			return 6;
 		}
-		return 0;
+		return 6;
 	}
 	
 	private String getValue(String s){
 		String[] split = s.split("\\:");
-		if(split[1] != null){
+		if(split.length == 2 && split[1] != null){
 			return split[1];
 		}
 		return "";
@@ -139,6 +189,7 @@ public class SMParser {
 	}
 	
 	private int noteToDirection(String note){
+		if(note.length() == 4){
 			if(note.charAt(0) == '1'){ 
 				if(note.charAt(1) == '1'){ //down left
 					return 7;
@@ -159,5 +210,7 @@ public class SMParser {
 				return 2;
 			}
 			return -1;
+		}
+		return -1;
 	}
 }
