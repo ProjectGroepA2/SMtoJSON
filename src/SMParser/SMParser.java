@@ -63,8 +63,8 @@ public class SMParser {
 						for(String notespersecond:notesplit){
 							notespersecond = notespersecond.trim();
 							String[] notes = notespersecond.split("\n");
-							double precision = 1.0/notes.length;
-							double time = secondscounter;
+							double precision = (1.0/notes.length)*1000;
+							double time = secondscounter*1000;
 							for(String note:notes){
 								int direction = noteToDirection(note);
 								if(direction != -1){
