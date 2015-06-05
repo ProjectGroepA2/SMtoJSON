@@ -58,7 +58,7 @@ public class SMParser {
 						int maxButtons = 1;						
 						JsonArrayBuilder objectsArrayBuilder = Json.createArrayBuilder();
 						JsonArrayBuilder buttonsArrayBuilder = Json.createArrayBuilder();
-						buttonsArrayBuilder.add(Json.createObjectBuilder().add("time", 0).add("button", 1).add("color", (int)(Math.random()*15+1)));
+						buttonsArrayBuilder.add(Json.createObjectBuilder().add("time", 0).add("button", 1).add("color", 0));
 												
 						for(String notespersecond:notesplit){
 							notespersecond = notespersecond.trim();
@@ -75,7 +75,7 @@ public class SMParser {
 									objectsArrayBuilder.add(object.build());
 								}
 								if(extraButtonTime*maxButtons < time && maxButtons+1 < difficultyToMaxButtons(difficulty)){ //add a new/extra button
-									buttonsArrayBuilder.add(Json.createObjectBuilder().add("time", time).add("button", maxButtons+1).add("color", (int)(Math.random()*15+1)));
+									buttonsArrayBuilder.add(Json.createObjectBuilder().add("time", time).add("button", maxButtons+1).add("color", maxButtons));
 									maxButtons++;
 								}
 								time += precision;
