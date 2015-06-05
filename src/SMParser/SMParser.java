@@ -75,7 +75,7 @@ public class SMParser {
 									objectsArrayBuilder.add(object.build());
 								}
 								if(extraButtonTime*maxButtons < time && maxButtons+1 < difficultyToMaxButtons(difficulty)){ //add a new/extra button
-									buttonsArrayBuilder.add(Json.createObjectBuilder().add("time", time).add("button", maxButtons).add("color", maxButtons));
+									buttonsArrayBuilder.add(Json.createObjectBuilder().add("time", time).add("button", maxButtons+1).add("color", (int)(Math.random()*15+1)));
 									maxButtons++;
 								}
 								time += precision;
