@@ -54,11 +54,11 @@ public class SMParser {
 						
 						notesplit = s.split("\\,"); //split everything in arrays which contains "beats" for 1 second
 						double secondscounter = Double.parseDouble(metadata[0])*-1;
-						int extraButtonTime = notesplit.length / difficultyToMaxButtons(difficulty);
+						int extraButtonTime = (notesplit.length / difficultyToMaxButtons(difficulty))*1000;
 						int maxButtons = 1;						
 						JsonArrayBuilder objectsArrayBuilder = Json.createArrayBuilder();
 						JsonArrayBuilder buttonsArrayBuilder = Json.createArrayBuilder();
-						buttonsArrayBuilder.add(Json.createObjectBuilder().add("time", 0).add("button", 0).add("color", 0));
+						buttonsArrayBuilder.add(Json.createObjectBuilder().add("time", 0).add("button", 1).add("color", (int)(Math.random()*15+1)));
 												
 						for(String notespersecond:notesplit){
 							notespersecond = notespersecond.trim();
@@ -152,7 +152,8 @@ public class SMParser {
 			JsonWriter jsonWriter = Json.createWriter(os);
 			jsonWriter.writeObject(file);
 			jsonWriter.close();		
-		} catch (FileNotFoundException e) {
+			os.close();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
