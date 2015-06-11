@@ -66,7 +66,7 @@ public class SMParser {
 							double precision = (1.0/notes.length)*1000;
 							double time = secondscounter*1000;
 							for(String note:notes){
-								int direction = noteToDirection(note);
+								int direction = noteToDirection(note.trim());
 								if(direction != -1){
 									JsonObjectBuilder object = Json.createObjectBuilder();
 									object.add("time", time);
@@ -74,7 +74,7 @@ public class SMParser {
 									object.add("button", (int)(Math.random()*maxButtons+1));
 									objectsArrayBuilder.add(object.build());
 								}
-								if(extraButtonTime*maxButtons < time && maxButtons+1 < difficultyToMaxButtons(difficulty)){ //add a new/extra button
+								if(extraButtonTime*maxButtons < time && maxButtons < difficultyToMaxButtons(difficulty)){ //add a new/extra button
 									buttonsArrayBuilder.add(Json.createObjectBuilder().add("time", time).add("button", maxButtons+1).add("color", maxButtons));
 									maxButtons++;
 								}
