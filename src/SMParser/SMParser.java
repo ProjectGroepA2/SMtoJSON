@@ -21,7 +21,7 @@ public class SMParser {
 	private static String[] metaDataHeaders = {"offset:","title:","artist:", "displaybpm:", "music","samplestart:", "banner:", "background:", "subtitle:"};
 	private String[] metadata;
 	private ArrayList<JsonObjectBuilder> arrays;
-	
+	private double lastNoteTime;
 	public SMParser(){
 		
 	}
@@ -68,11 +68,14 @@ public class SMParser {
 							for(String note:notes){
 								int direction = noteToDirection(note.trim());
 								if(direction != -1){
-									JsonObjectBuilder object = Json.createObjectBuilder();
-									object.add("time", time);
-									object.add("direction", direction);
-									object.add("button", (int)(Math.random()*maxButtons+1));
-									objectsArrayBuilder.add(object.build());
+									if(time - lastNoteTime > 250){
+										JsonObjectBuilder object = Json.createObjectBuilder();
+										object.add("time", time);
+										object.add("direction", direction);
+										object.add("button", (int)(Math.random()*maxButtons+1));
+										objectsArrayBuilder.add(object.build());
+										lastNoteTime = time;
+									}
 								}
 								if(extraButtonTime*maxButtons < time && maxButtons < difficultyToMaxButtons(difficulty)){ //add a new/extra button
 									buttonsArrayBuilder.add(Json.createObjectBuilder().add("time", time).add("button", maxButtons+1).add("color", maxButtons));
