@@ -60,6 +60,7 @@ public class SMParser {
 						buttonsArrayBuilder.add(Json.createObjectBuilder().add("time", 0).add("button", 1).add("color", 0));
 						
 						double lastNoteTime = 0;
+						int objectscounter = 0;
 						System.out.println(difficultyToButtonsTiming(difficulty) + "-" + difficulty);
 						for(String notespersecond:notesplit){
 							notespersecond = notespersecond.trim();
@@ -76,6 +77,7 @@ public class SMParser {
 										object.add("button", (int)(Math.random()*maxButtons+1));
 										objectsArrayBuilder.add(object.build());
 										lastNoteTime = time;
+										objectscounter++;
 									}
 								}
 								if(extraButtonTime*maxButtons < time && maxButtons < difficultyToMaxButtons(difficulty)){ //add a new/extra button
@@ -86,8 +88,7 @@ public class SMParser {
 							}
 							secondscounter++;
 						}
-						
-						if(objectsArrayBuilder.build().size() > 15)
+						if(objectscounter > 15)
 						{
 							arrays.add(Json.createObjectBuilder());
 							arrays.get(arrays.size()-1).add("difficulty", difficulty);
