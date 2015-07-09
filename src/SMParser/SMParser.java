@@ -68,7 +68,7 @@ public class SMParser {
 							for(String note:notes){
 								int direction = noteToDirection(note.trim());
 								if(direction != -1){
-									if(time - lastNoteTime > 250){
+									if(time - lastNoteTime > difficultyToButtonsTiming(difficulty)){
 										JsonObjectBuilder object = Json.createObjectBuilder();
 										object.add("time", time);
 										object.add("direction", direction);
@@ -162,8 +162,18 @@ public class SMParser {
 
 	}
 	
-	
-	
+	private int difficultyToButtonsTiming(String d){
+		if(d.toLowerCase().equals("beginner")){
+			return 500;
+		}else if(d.equals("easy")){
+			return 250;
+		}else if(d.equals("medium")){
+			return 200;
+		}else if(d.equals("hard")){
+			return 150;
+		}
+		return 150;
+	}
 	
 	private int difficultyToMaxButtons(String d){
 		if(d.toLowerCase().equals("beginner")){
