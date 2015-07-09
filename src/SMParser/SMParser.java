@@ -86,10 +86,13 @@ public class SMParser {
 							secondscounter++;
 						}
 						
-						arrays.add(Json.createObjectBuilder());
-						arrays.get(arrays.size()-1).add("difficulty", difficulty);
-						arrays.get(arrays.size()-1).add("objects", objectsArrayBuilder);
-						arrays.get(arrays.size()-1).add("buttons", buttonsArrayBuilder);					
+						if(objectsArrayBuilder.build().size() > 15)
+						{
+							arrays.add(Json.createObjectBuilder());
+							arrays.get(arrays.size()-1).add("difficulty", difficulty);
+							arrays.get(arrays.size()-1).add("objects", objectsArrayBuilder);
+							arrays.get(arrays.size()-1).add("buttons", buttonsArrayBuilder);		
+						}
 					}
 				};
 			}
