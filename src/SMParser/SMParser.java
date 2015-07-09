@@ -21,7 +21,6 @@ public class SMParser {
 	private static String[] metaDataHeaders = {"offset:","title:","artist:", "displaybpm:", "music","samplestart:", "banner:", "background:", "subtitle:"};
 	private String[] metadata;
 	private ArrayList<JsonObjectBuilder> arrays;
-	private double lastNoteTime;
 	public SMParser(){
 		
 	}
@@ -45,7 +44,7 @@ public class SMParser {
 				if(s.contains("NOTES")){
 					String[] notesplit = s.split("\n");
 					if(notesplit[1].contains("-single:")){ //valid note (single player mode)
-						String difficulty = notesplit[3].replace(":", "").trim();
+						String difficulty = notesplit[3].replace(":", "").trim().toLowerCase();
 						for(int k = 0; k < 6; k++){ //remove first 6 lines
 							s = s.substring(s.indexOf('\n')+1);
 						}
@@ -59,7 +58,9 @@ public class SMParser {
 						JsonArrayBuilder objectsArrayBuilder = Json.createArrayBuilder();
 						JsonArrayBuilder buttonsArrayBuilder = Json.createArrayBuilder();
 						buttonsArrayBuilder.add(Json.createObjectBuilder().add("time", 0).add("button", 1).add("color", 0));
-												
+						
+						double lastNoteTime = 0;
+						System.out.println(difficultyToButtonsTiming(difficulty) + "-" + difficulty);
 						for(String notespersecond:notesplit){
 							notespersecond = notespersecond.trim();
 							String[] notes = notespersecond.split("\n");
@@ -68,7 +69,7 @@ public class SMParser {
 							for(String note:notes){
 								int direction = noteToDirection(note.trim());
 								if(direction != -1){
-									if(time - lastNoteTime > difficultyToButtonsTiming(difficulty)){
+									if(time - lastNoteTime >= difficultyToButtonsTiming(difficulty)){
 										JsonObjectBuilder object = Json.createObjectBuilder();
 										object.add("time", time);
 										object.add("direction", direction);
@@ -166,26 +167,30 @@ public class SMParser {
 	}
 	
 	private int difficultyToButtonsTiming(String d){
-		if(d.toLowerCase().equals("beginner")){
-			return 500;
+		if(d.equals("beginner")){
+			return 650;
 		}else if(d.equals("easy")){
-			return 250;
+			return 600;
 		}else if(d.equals("medium")){
-			return 200;
+			return 550;
 		}else if(d.equals("hard")){
-			return 150;
+			return 500;
+		}else if(d.equals("challenge")){
+			return 450;
 		}
-		return 150;
+		return 400;
 	}
 	
 	private int difficultyToMaxButtons(String d){
-		if(d.toLowerCase().equals("beginner")){
+		if(d.equals("beginner")){
 			return 2;
 		}else if(d.equals("easy")){
 			return 3;
 		}else if(d.equals("medium")){
 			return 4;
 		}else if(d.equals("hard")){
+			return 5;
+		}else if(d.equals("challenge")){
 			return 6;
 		}
 		return 6;
